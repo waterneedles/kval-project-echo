@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import dotenv from "dotenv";
 import { increaseApiLimit, checkApiLimit } from "@/lib/api-limit";
+import { checkSubscription } from "@/lib/subscription";
 
 dotenv.config();
 
@@ -34,8 +35,9 @@ export async function POST(req: Request) {
         }
 
         const freeTrial = await checkApiLimit();
+        const isPro = await checkSubscription();
 
-        if (!freeTrial) {
+        if (!freeTrial && !isPro) {
             return new NextResponse("Free tries have expired!", { status: 403 });
         }
 
@@ -48,8 +50,10 @@ export async function POST(req: Request) {
             model: "gpt-3.5-turbo",
             messages
         });
-
-        await increaseApiLimit();
+        
+        if (!isPro) {
+            await increaseApiLimit();
+        }
 
         console.log("OpenAI response:", response);
 

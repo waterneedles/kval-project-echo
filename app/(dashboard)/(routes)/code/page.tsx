@@ -19,8 +19,11 @@ import { Loader } from "@/components/loader";
 import { cn } from "@/lib/utils";
 import { Userimage } from "@/components/userimage";
 import { Aiavatar } from "@/components/aiavatar";
+import { ProModal } from "@/components/promodal";
+import { useProModal } from "@/hooks/usepromodal";
 
 const CodeGeneration = () => {
+    const proModal = useProModal();
     const router = useRouter();
     const [messages, setMessages] = useState<OpenAI.Chat.CreateChatCompletionRequestMessage[]>([]);
 
@@ -55,6 +58,9 @@ const CodeGeneration = () => {
 
             form.reset();
         } catch (error: any) {
+            if (error?.response?.status === 403) {
+                proModal.onOpen();
+            }
             console.error("Error during API call:", error);
         } finally {
             router.refresh();

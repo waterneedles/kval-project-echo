@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import dotenv from "dotenv";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
+import { checkApiLimit, increaseApiLimit } from "@/lib/api-limit";
+import { checkSubscription } from "@/lib/subscription";
 
 dotenv.config();
 
@@ -38,6 +40,13 @@ export async function POST(req: Request) {
             return new NextResponse("Messages are required and must be an array", { status: 400 });
         }
 
+        const freeTrial = await checkApiLimit();
+        const isPro = await checkSubscription();
+
+        if (!freeTrial && !isPro) {
+            return new NextResponse("Free tries have expired!", { status: 403 });
+        }
+
         if (!openai.apiKey) {
             console.error("[CONFIG_ERROR] OpenAI API Key not configured.");
             return new NextResponse("OpenAI API Key not configured", { status: 500 });
@@ -47,6 +56,10 @@ export async function POST(req: Request) {
             model: "gpt-3.5-turbo",
             messages: [instructionMessage, ...messages]
         });
+
+        if (!isPro) {
+            await increaseApiLimit();
+        }
 
         console.log("OpenAI response:", response);
 

@@ -17,10 +17,11 @@ export const LandingHero = () => {
           <TypewriterComponent
             options={{
               strings: [
-                "Chatbot.",
-                "Photo Generation.",
-                "Blog Writing.",
-                "Mail Writing."
+                "Text Generation",
+                "Image Creation",
+                "Video Creation",
+                "Code Generation",
+                "Music Generation"
               ],
               autoStart: true,
               loop: true,

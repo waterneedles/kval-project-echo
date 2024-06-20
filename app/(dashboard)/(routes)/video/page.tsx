@@ -14,9 +14,11 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Loader } from "@/components/loader";
 import { formSchema } from "./constants";
 import { Empty } from "@/components/empty";
+import { useProModal } from "@/hooks/usepromodal";
+import { ProModal } from "@/components/promodal";
 
 const VideoPage = () => {
-
+  const proModal = useProModal();
   const router = useRouter();
   const [video, setVideo] = useState<string>();
 
